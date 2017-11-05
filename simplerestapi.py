@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import sqlite3
 import json
 import re
@@ -22,12 +21,6 @@ class Registry:
                     return (m, entry[2])
         else:
             raise Registry.NotFound("no match for {} of {}".format(method, url))
-
-def get_builds(matchedUrl, data):
-    return {"builds": [1,2,3]}
-
-def set_build(matchedUrl, data):
-    print "data: " + str(data)
 
 class Handler(BaseHTTPRequestHandler):
     def __init__(self, registry, *args):
@@ -65,16 +58,12 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as e:
             self.do_send_response(500, e.message)
 
-
 class SimpleRestApi:
     def __init__(self, port):
         self.registry = Registry()
-        Handler.registry = self.registry
-        server_address = ('', port)
-
         def handler(*args):
             Handler(self.registry, *args)
-
+        server_address = ('', port)
         self.httpd = HTTPServer(server_address, handler)
     
     def run_forever(self):
@@ -82,13 +71,3 @@ class SimpleRestApi:
 
     def add(self, *args):
         self.registry.add(*args)
-
-def run():
-    api = SimpleRestApi(8000)
-    api.add("get", "/builds", get_builds)
-    api.add("put", "/builds", set_build)
-    api.run_forever()
-
-
-if __name__ == "__main__":
-    run()
